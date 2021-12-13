@@ -1,0 +1,61 @@
+unit Controller.Clientes;
+
+interface
+
+uses
+  Controller.Interfaces;
+
+Type
+  TControllerCliente = class(TInterfacedObject, iControllerCliente)
+    private
+      FCodigo: Integer;
+    public
+      constructor Create;
+      destructor Destroy; override;
+      class function New: iControllerCliente; 
+      function Codigo(Value: Integer): iControllerCliente;
+      function Selecionar(Id: Integer):  iControllerCliente;
+      function Cadastrar:  iControllerCliente;
+      function Excluir:  iControllerCliente;
+  end;
+
+implementation
+
+{ TControllerCliente }
+
+function TControllerCliente.Codigo(Value: Integer): iControllerCliente;
+begin
+  Result := Self;
+  FCodigo := Value;
+end;
+
+function TControllerCliente.Selecionar(Id: Integer): iControllerCliente;
+begin
+  Result := Self;
+end;
+
+function TControllerCliente.Cadastrar: iControllerCliente;
+begin
+  Result := Self;
+end;
+
+function TControllerCliente.Excluir: iControllerCliente;
+begin
+  Result := Self;
+end;
+
+constructor TControllerCliente.Create;
+begin
+                                                                
+end;
+
+destructor TControllerCliente.Destroy;
+begin
+
+  inherited;
+end;
+
+class function TControllerCliente.New: IControllerCliente;
+begin       
+  Result := Self.Create;
+end;

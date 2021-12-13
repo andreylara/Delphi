@@ -1,0 +1,13 @@
+program ClientXML;
+
+uses
+  Vcl.Forms,
+  uCliente in 'uCliente.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.Run;
+end.

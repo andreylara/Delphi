@@ -1,0 +1,81 @@
+unit DAO.Cidade;
+
+interface
+
+uses
+  Model.Cidade, System.JSON, REST.Types, System.SysUtils, System.StrUtils;
+
+type
+  TDaoCidade = class
+    private
+    public
+      procedure Pesquisar;
+      function Salvar(oCidade: TCidade; out sErro: String): Boolean;
+  end;
+
+var
+  DaoCidade: TDaoCidade;
+
+implementation
+
+uses
+  Model.Dados;
+
+{ TDaoCidade }
+
+procedure TDaoCidade.Pesquisar;
+begin
+  {try
+    if iCidade = 0 then
+      dm.ReqClienteGet.ExecuteAsync(ProcesGETClientes, True, True, ProcesGETClientesErro)
+    else
+      dm.ReqClienteCidadeGet.ExecuteAsync(ProcesGETClientesCidade, True, True, ProcesGETClientesErro);
+
+  except
+    on ex: exception do
+      ShowMessage('Erro ao acessar o servidor: ' + ex.Message);
+  end;}
+end;
+
+function TDaoCidade.Salvar(oCidade: TCidade; out sErro: String): Boolean;
+var
+  jsonBody: TJSONObject;
+  sVerbo: String;
+begin
+  try
+    try
+      Result := false;
+      sErro := '';
+
+      jsonBody := TJSONObject.Create;
+      jsonBody.AddPair('nome', oCidade.Nome);
+      jsonBody.AddPair('estado', oCidade.Estado);
+
+      if sVerbo = rmPUT then
+        jsonBody.AddPair('id', oCidade.Id.ToString);
+
+      dm.ReqCidadePostPut.Params.Clear;
+      dm.ReqCidadePostPut.Body.ClearBody;
+      dm.ReqCidadePostPut.Method := sVerbo;
+      dm.ReqCidadePostPut.Body.Add(jsonBody.ToString,
+        ContentTypeFromString('application/json'));
+      dm.ReqCidadePostPut.Execute;
+
+      if (dm.ReqCidadePostPut.Response.StatusCode <> 200) and
+        (dm.ReqCidadePostPut.Response.StatusCode <> 201) then
+      begin
+        sErro := 'Erro ao salvar dados: ';
+        Exit;
+      end;
+
+      Result := True;
+    except
+      on ex: exception do
+        sErro := 'Erro inesperado: ' + ex.Message;
+    end;
+  finally
+    jsonBody.Free;
+  end;
+end;
+
+end.

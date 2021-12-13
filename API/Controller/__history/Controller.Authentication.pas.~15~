@@ -1,0 +1,104 @@
+unit Controller.Authentication;
+
+interface
+
+uses
+  System.SysUtils,
+  Horse,
+  JOSE.Core.JWT,
+  JOSE.Core.JWS,
+  JOSE.Core.JWK,
+  JOSE.Core.JWA,
+  JOSE.Types.JSON;
+
+var
+  FCompact: string;
+
+procedure BuildToken;
+function VerifyToken: Boolean;
+function Authentication(Req: THorseRequest; Res: THorseResponse; Next: TProc): Boolean;
+
+implementation
+
+uses
+  JOSE.Core.Builder, Vcl.Dialogs;
+
+procedure BuildToken;
+var
+  LToken: TJWT;
+  LAlg: TJOSEAlgorithmId;
+  Key: String;
+begin
+  LToken := TJWT.Create;
+  Key := '';
+  try
+    LToken.Claims.Subject := 'Andrey Lara';
+    LToken.Claims.IssuedAt := Now;
+    LToken.Claims.Expiration := Now + 1;
+    LToken.Claims.Issuer := 'Visual Software';
+
+    LToken.Claims.SetClaimOfType<string>('nome', 'Andrey');
+    LToken.Claims.SetClaimOfType<string>('senha', '123');
+    LAlg := TJOSEAlgorithmId.HS256;
+
+    Key := TJSONUtils.ToJSON(LToken.Claims.JSON.GetValue('nome')) + TJSONUtils.ToJSON(LToken.Claims.JSON.GetValue('senha'));
+    FCompact := TJOSE.SerializeCompact(Key, LAlg, LToken);
+
+    ShowMessage(FCompact);
+
+    ShowMessage('Header: ' + TJSONUtils.ToJSON(LToken.Header.JSON));
+    ShowMessage('Claims: ' + TJSONUtils.ToJSON(LToken.Claims.JSON.GetValue('nome')));
+    ShowMessage('Claims: ' + TJSONUtils.ToJSON(LToken.Claims.JSON.GetValue('senha')));
+  finally
+    LToken.Free;
+  end;
+end;
+
+function VerifyToken: Boolean;
+var
+  LToken: TJWT;
+  Key: String;
+begin
+  Result := False;
+  Key := 'Andrey123';
+  LToken := TJOSE.Verify(Key, FCompact);
+
+  if Assigned(LToken) then
+  begin
+    try
+      Result := LToken.Verified;
+    finally
+      LToken.Free;
+    end;
+  end;
+end;
+
+function Authentication(Req: THorseRequest; Res: THorseResponse; Next: TProc): Boolean;
+var
+  erro: string;
+  body: TJsonValue;
+begin
+
+  try
+    try
+      body := TJSONObject.ParseJSONValue(TEncoding.UTF8.GetBytes(Req.body), 0)
+        as TJsonValue;
+
+      body.Free;
+
+      if erro <> '' then
+        raise Exception.Create(erro);
+
+    except
+      on ex: Exception do
+      begin
+        Res.Send(ex.Message).Status(400);
+        exit;
+      end;
+    end;
+
+  finally
+  end;
+end;
+
+end.

@@ -1,0 +1,510 @@
+unit UnitPrincipal;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, cxGraphics, cxControls, cxLookAndFeels,
+  cxLookAndFeelPainters, dxSkinsCore, dxBarBuiltInMenu, cxContainer, cxEdit,
+  Vcl.Menus, Vcl.ExtCtrls, Vcl.StdCtrls, cxButtons, Vcl.ComCtrls, cxGroupBox,
+  cxPC, dxGDIPlusClasses, cxStyles, cxCustomData, cxFilter, cxData,
+  cxDataStorage, cxNavigator, uUtil_FD, REST.Types,
+  cxDataControllerConditionalFormattingRulesManagerDialog, Data.DB, cxDBData,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, cxGridLevel, cxGridCustomTableView,
+  cxGridTableView, cxGridDBTableView, cxClasses, cxGridCustomView, cxGrid,
+  Datasnap.DBClient, System.JSON, cxCurrencyEdit, Vcl.Grids, Vcl.DBGrids,
+  cxTextEdit, cxMaskEdit, cxDropDownEdit;
+
+type
+  TFrmPrincipal = class(TForm)
+    tabControl: TcxPageControl;
+    tabLista: TcxTabSheet;
+    tabCadastro: TcxTabSheet;
+    gbFuncaoLista: TcxGroupBox;
+    lbTelefone: TLabel;
+    edtFone: TEdit;
+    lbEmail: TLabel;
+    edtEmail: TEdit;
+    lbNome: TLabel;
+    edtNome: TEdit;
+    imgSalvar: TImage;
+    imgExcluir: TImage;
+    imgAdicionar: TImage;
+    dbgCliente: TDBGrid;
+    dsCliente: TDataSource;
+    tabControlLista: TcxPageControl;
+    tabLsitaCidade: TcxTabSheet;
+    tabListaCliente: TcxTabSheet;
+    dbgCidade: TDBGrid;
+    dsCidade: TDataSource;
+    cdsCidade: TClientDataSet;
+    cdsCidadeId: TIntegerField;
+    cdsCidadeNome: TStringField;
+    cdsCidadeEstado: TStringField;
+    tabControlCadastro: TcxPageControl;
+    tabCadCliente: TcxTabSheet;
+    tabCadCidade: TcxTabSheet;
+    gbFuncaoCad: TcxGroupBox;
+    lbCidade: TLabel;
+    edtCidade: TEdit;
+    lbEstado: TLabel;
+    edtEstado: TEdit;
+    cdsCliente: TClientDataSet;
+    cdsClienteId: TIntegerField;
+    cdsClienteNome: TStringField;
+    cdsClienteEmail: TStringField;
+    cdsClienteFone: TStringField;
+    cdsClienteCidade: TStringField;
+    gbFiltroCidade: TcxGroupBox;
+    Label1: TLabel;
+    cbbFiltroCidades: TcxComboBox;
+    procedure imgAdicionarClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure imgSalvarClick(Sender: TObject);
+    procedure imgExcluirClick(Sender: TObject);
+    procedure AddClienteGrid(id: integer; nome, email, fone, cidade: string);
+    procedure AddCidadeGrid(id: integer; nome, estado: string);
+    procedure AlteraPagina(page: integer);
+    procedure GETClientes;
+    procedure GETCidades;
+    procedure ProcesGETClientes;
+    procedure ProcesGETClientesCidade;
+    procedure ProcesGETCidades;
+    procedure ProcesGETClientesErro(Sender: TObject);
+    procedure ProcesGETCidadesErro(Sender: TObject);
+    function PostPutCliente(verbo: TRestRequestMethod; id: integer;
+      nome, email, fone: string; out erro: string): Boolean;
+    function PostPutCidade(verbo: TRestRequestMethod; id: integer;
+      nome, estado: string; out erro: string): Boolean;
+    function DeleteCliente(id: integer; out erro: string): Boolean;
+    function DeleteCidade(id: integer; out erro: string): Boolean;
+    procedure LimpaCampos;
+    procedure dbgClienteDblClick(Sender: TObject);
+    procedure dbgCidadeDblClick(Sender: TObject);
+    procedure cbbFiltroCidadesPropertiesChange(Sender: TObject);
+  private
+    vCliente, vCidade: integer;
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FrmPrincipal: TFrmPrincipal;
+
+implementation
+
+{$R *.dfm}
+
+uses UnitDM;
+
+procedure TFrmPrincipal.AddClienteGrid(id: integer; nome, email, fone, cidade: string);
+begin
+  cdsCliente.Open;
+  cdsCliente.Append;
+  cdsClienteId.Value := id;
+  cdsClienteNome.Value := nome;
+  cdsClienteEmail.Value := email;
+  cdsClienteFone.Value := fone;
+  cdsClienteCidade.Value := cidade;
+end;
+
+procedure TFrmPrincipal.AddCidadeGrid(id: integer; nome, estado: string);
+begin
+  cdsCidade.Open;
+  cdsCidade.Append;
+  cdsCidadeId.Value := id;
+  cdsCidadeNome.Value := nome;
+  cdsCidadeEstado.Value := estado;
+end;
+
+procedure TFrmPrincipal.AlteraPagina(page: integer);
+begin
+  if tabControl.ActivePageIndex = 0 then
+    tabControlCadastro.ActivePageIndex := tabControlLista.ActivePageIndex
+  else
+    tabControlLista.ActivePageIndex := tabControlCadastro.ActivePageIndex;
+  tabControl.ActivePageIndex := page;
+end;
+
+procedure TFrmPrincipal.cbbFiltroCidadesPropertiesChange(Sender: TObject);
+begin
+  if cbbFiltroCidades.ItemIndex > 0 then
+    vCidade := cbbFiltroCidades.ItemIndex
+  else
+    vCidade := 0;
+  GETClientes;
+end;
+
+procedure TFrmPrincipal.dbgClienteDblClick(Sender: TObject);
+begin
+  imgExcluir.Visible := True;
+  vCliente := cdsClienteId.Value;
+  edtNome.Text := cdsClienteNome.Value;
+  edtEmail.Text := cdsClienteEmail.Value;
+  edtFone.Text := cdsClienteFone.Value;
+  AlteraPagina(1);
+end;
+
+procedure TFrmPrincipal.dbgCidadeDblClick(Sender: TObject);
+begin
+  imgExcluir.Visible := True;
+  vCliente := cdsCidadeId.Value;
+  edtCidade.Text := cdsCidadeNome.Value;
+  edtEstado.Text := cdsCidadeEstado.Value;
+  AlteraPagina(1);
+end;
+
+function TFrmPrincipal.DeleteCliente(id: integer; out erro: string): Boolean;
+begin
+  try
+    Result := false;
+    erro := '';
+
+    dm.ReqClienteDelete.Resource := 'cliente/' + id.ToString;
+    dm.ReqClienteDelete.Execute;
+
+    if (dm.ReqClienteDelete.Response.StatusCode <> 200) then
+    begin
+      erro := 'Erro ao excluir dados: ';
+      Exit;
+    end;
+
+    Result := True;
+  except
+    on ex: exception do
+      ShowMessage('Erro inesperado : ' + ex.Message);
+  end;
+end;
+
+function TFrmPrincipal.DeleteCidade(id: integer; out erro: string): Boolean;
+begin
+  try
+    Result := false;
+    erro := '';
+
+    dm.ReqCidadeDelete.Resource := 'cidade/' + id.ToString;
+    dm.ReqCidadeDelete.Execute;
+
+    if (dm.ReqCidadeDelete.Response.StatusCode <> 200) then
+    begin
+      erro := 'Erro ao excluir dados: ';
+      Exit;
+    end;
+
+    Result := True;
+  except
+    on ex: exception do
+      ShowMessage('Erro inesperado : ' + ex.Message);
+  end;
+end;
+
+procedure TFrmPrincipal.FormShow(Sender: TObject);
+begin
+  AlteraPagina(0);
+  GETClientes;
+  sleep(3000);
+  GETCidades;
+end;
+
+procedure TFrmPrincipal.GETClientes;
+begin
+  cdsCliente.EmptyDataSet;
+  try
+    if vCidade = 0 then
+      dm.ReqClienteGet.ExecuteAsync(ProcesGETClientes, True, True, ProcesGETClientesErro)
+    else
+      dm.ReqClienteCidadeGet.ExecuteAsync(ProcesGETClientesCidade, True, True, ProcesGETClientesErro);
+  except
+    on ex: exception do
+      ShowMessage('Erro ao acessar o servidor: ' + ex.Message);
+  end;
+end;
+
+procedure TFrmPrincipal.GETCidades;
+begin
+  cdsCidade.EmptyDataSet;
+  try
+    dm.ReqCidadeGet.ExecuteAsync(ProcesGETCidades, True, True, ProcesGETCidadesErro);
+  except
+    on ex: exception do
+      ShowMessage('Erro ao acessar o servidor: ' + ex.Message);
+  end;
+end;
+
+procedure TFrmPrincipal.imgAdicionarClick(Sender: TObject);
+begin
+  LimpaCampos;
+  AlteraPagina(1);
+end;
+
+procedure TFrmPrincipal.imgSalvarClick(Sender: TObject);
+var
+  erro: string;
+  verbo: TRestRequestMethod;
+begin
+  if vCliente = 0 then
+    verbo := rmPost
+  else
+    verbo := rmPUT;
+
+  if tabControlCadastro.ActivePageIndex = 0 then
+  begin
+    if not PostPutCliente(verbo, vCliente, edtNome.Text, edtEmail.Text, edtFone.Text,
+      erro) then
+      ShowMessage(erro)
+    else
+    begin
+      GETClientes;
+      LimpaCampos;
+      AlteraPagina(0);
+    end;
+  end else
+  begin
+    if not PostPutCidade(verbo, vCliente, edtCidade.Text, edtEstado.Text, erro) then
+      ShowMessage(erro)
+    else
+    begin
+      GETCidades;
+      LimpaCampos;
+      AlteraPagina(0);
+    end;
+  end;
+end;
+
+procedure TFrmPrincipal.LimpaCampos;
+begin
+  edtNome.Text := '';
+  edtEmail.Text := '';
+  edtFone.Text := '';
+  edtCidade.Text := '';
+  edtEstado.Text := '';
+  imgExcluir.Visible := false;
+  vCliente := 0;
+  vCidade := 0;
+end;
+
+procedure TFrmPrincipal.imgExcluirClick(Sender: TObject);
+var
+  erro: string;
+begin
+  if tabControlCadastro.ActivePageIndex = 0 then
+  begin
+    if not DeleteCliente(vCliente, erro) then
+      ShowMessage(erro)
+    else
+    begin
+      GETClientes;
+      LimpaCampos;
+      AlteraPagina(0);
+    end;
+  end
+  else
+  begin
+    if not DeleteCidade(vCliente, erro) then
+      ShowMessage(erro)
+    else
+    begin
+      GETCidades;
+      LimpaCampos;
+      AlteraPagina(0);
+    end;
+  end;
+end;
+
+function TFrmPrincipal.PostPutCliente(verbo: TRestRequestMethod; id: integer;
+  nome, email, fone: string; out erro: string): Boolean;
+var
+  jsonBody: TJSONObject;
+begin
+  try
+    try
+      Result := false;
+      erro := '';
+
+      jsonBody := TJSONObject.Create;
+      jsonBody.AddPair('nome', nome);
+      jsonBody.AddPair('email', email);
+      jsonBody.AddPair('fone', fone);
+
+      if verbo = rmPUT then
+        jsonBody.AddPair('id', id.ToString);
+
+      dm.ReqClientePostPut.Params.Clear;
+      dm.ReqClientePostPut.Body.ClearBody;
+      dm.ReqClientePostPut.Method := verbo;
+      dm.ReqClientePostPut.Body.Add(jsonBody.ToString,
+        ContentTypeFromString('application/json'));
+      dm.ReqClientePostPut.Execute;
+
+      if (dm.ReqClientePostPut.Response.StatusCode <> 200) and
+        (dm.ReqClientePostPut.Response.StatusCode <> 201) then
+      begin
+        erro := 'Erro ao salvar dados: ';
+        Exit;
+      end;
+
+      Result := True;
+    except
+      on ex: exception do
+        erro := 'Erro inesperado: ' + ex.Message;
+    end;
+  finally
+    jsonBody.Free;
+  end;
+end;
+
+function TFrmPrincipal.PostPutCidade(verbo: TRestRequestMethod; id: integer;
+  nome, estado: string; out erro: string): Boolean;
+var
+  jsonBody: TJSONObject;
+begin
+  try
+    try
+      Result := false;
+      erro := '';
+
+      jsonBody := TJSONObject.Create;
+      jsonBody.AddPair('nome', nome);
+      jsonBody.AddPair('estado', estado);
+
+      if verbo = rmPUT then
+        jsonBody.AddPair('id', id.ToString);
+
+      dm.ReqCidadePostPut.Params.Clear;
+      dm.ReqCidadePostPut.Body.ClearBody;
+      dm.ReqCidadePostPut.Method := verbo;
+      dm.ReqCidadePostPut.Body.Add(jsonBody.ToString,
+        ContentTypeFromString('application/json'));
+      dm.ReqCidadePostPut.Execute;
+
+      if (dm.ReqCidadePostPut.Response.StatusCode <> 200) and
+        (dm.ReqCidadePostPut.Response.StatusCode <> 201) then
+      begin
+        erro := 'Erro ao salvar dados: ';
+        Exit;
+      end;
+
+      Result := True;
+    except
+      on ex: exception do
+        erro := 'Erro inesperado: ' + ex.Message;
+    end;
+  finally
+    jsonBody.Free;
+  end;
+end;
+
+procedure TFrmPrincipal.ProcesGETClientes;
+var
+  JSON: string;
+  arrayClientes: TJSONArray;
+  i: integer;
+begin
+  if dm.ReqClienteGet.Response.StatusCode <> 200 then
+  begin
+    ShowMessage('Nenhum cliente encontrado!');
+    Exit;
+  end;
+
+  try
+    JSON := dm.ReqClienteGet.Response.JSONValue.ToString();
+    arrayClientes := TJSONObject.ParseJSONValue(TEncoding.UTF8.GetBytes(JSON),
+      0) as TJSONArray;
+
+    for i := 0 to arrayClientes.Size - 1 do
+    begin
+      AddClienteGrid(
+        arrayClientes.Get(i).GetValue<integer>('id', 0),
+        arrayClientes.Get(i).GetValue<string>('nome', ''),
+        arrayClientes.Get(i).GetValue<string>('email', ''),
+        arrayClientes.Get(i).GetValue<string>('fone', ''),
+        arrayClientes.Get(i).GetValue<string>('cidade', ''));
+    end;
+  finally
+    arrayClientes.Free;
+  end;
+end;
+
+procedure TFrmPrincipal.ProcesGETClientesCidade;
+var
+  JSON: string;
+  arrayClientes: TJSONArray;
+  i: integer;
+begin
+  dm.ReqClienteCidadeGet.Resource := 'cliente/cidade/' + vCidade.ToString;
+  dm.ReqClienteCidadeGet.Execute;
+
+  if dm.ReqClienteCidadeGet.Response.StatusCode <> 200 then
+  begin
+    ShowMessage('Erro ao consultar dados: ' +
+      dm.ReqClienteCidadeGet.Response.StatusCode.ToString);
+    Exit;
+  end;
+
+  try
+    JSON := dm.ReqClienteCidadeGet.Response.JSONValue.ToString();
+    arrayClientes := TJSONObject.ParseJSONValue(TEncoding.UTF8.GetBytes(JSON),
+      0) as TJSONArray;
+
+    for i := 0 to arrayClientes.Size - 1 do
+    begin
+      AddClienteGrid(
+        arrayClientes.Get(i).GetValue<integer>('id', 0),
+        arrayClientes.Get(i).GetValue<string>('nome', ''),
+        arrayClientes.Get(i).GetValue<string>('email', ''),
+        arrayClientes.Get(i).GetValue<string>('fone', ''),
+        arrayClientes.Get(i).GetValue<string>('cidade', ''));
+    end;
+  finally
+    arrayClientes.Free;
+    vCidade := 0;
+  end;
+end;
+
+procedure TFrmPrincipal.ProcesGETCidades;
+var
+  JSON: string;
+  arrayCidades: TJSONArray;
+  i: integer;
+begin
+  if dm.ReqCidadeGet.Response.StatusCode <> 200 then
+  begin
+    ShowMessage('Nenhuma cidade encontrada!');
+    Exit;
+  end;
+
+  try
+    JSON := dm.ReqCidadeGet.Response.JSONValue.ToString();
+    arrayCidades := TJSONObject.ParseJSONValue(TEncoding.UTF8.GetBytes(JSON),
+      0) as TJSONArray;
+
+    for i := 0 to arrayCidades.Size - 1 do
+    begin
+      AddCidadeGrid(arrayCidades.Get(i).GetValue<integer>('id', 0),
+        arrayCidades.Get(i).GetValue<string>('nome', ''),
+        arrayCidades.Get(i).GetValue<string>('estado', ''));
+      cbbFiltroCidades.Properties.Items.Add(arrayCidades.Get(i).GetValue<string>('nome', ''));
+    end;
+    cbbFiltroCidades.ItemIndex := 0;
+  finally
+    arrayCidades.Free;
+  end;
+end;
+
+procedure TFrmPrincipal.ProcesGETClientesErro(Sender: TObject);
+begin
+  if Assigned(Sender) and (Sender is exception) then
+    ShowMessage(exception(Sender).Message);
+end;
+
+procedure TFrmPrincipal.ProcesGETCidadesErro(Sender: TObject);
+begin
+  if Assigned(Sender) and (Sender is exception) then
+    ShowMessage(exception(Sender).Message);
+end;
+
+end.

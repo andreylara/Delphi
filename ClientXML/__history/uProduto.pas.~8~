@@ -1,0 +1,134 @@
+unit uProduto;
+
+interface
+
+uses
+  System.Classes, DBClient, XMLDoc, XMLIntf;
+
+const
+  Path = 'C:\Visual Software\Teste.xml';
+  
+type
+  TProdutoSingleton = class(TComponent)
+  private
+    Descricao: String;
+    Valor: Double;
+    Quantidade: Double;
+    Total: Double;
+
+    constructor Create(AOWner: TComponent); override;
+  public
+    class function GetInstance: TProdutoSingleton;
+
+    class function NewInstance: TObject; override;
+
+    function ProximoID(Id: integer): integer;
+    function CalculaTotal(Valor, Quantidade: Double): Double;
+    procedure GerarXML(pProdutos: TClientDataSet);
+    procedure LerXML(Id: Integer; out pProdutos: TClientDataSet);
+
+    destructor Destroy; override;
+  end;
+
+var
+  Instance: TProdutoSingleton;
+
+implementation
+
+uses
+  Forms, SysUtils;
+
+{ TProdutoSingleton }
+
+function TProdutoSingleton.CalculaTotal(Valor, Quantidade: Double): Double;
+begin
+  Result := Valor * Quantidade;
+end;
+
+constructor TProdutoSingleton.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+end;
+
+destructor TProdutoSingleton.Destroy;
+begin
+  FreeAndNil(Instance);
+  inherited;
+end;
+
+class function TProdutoSingleton.NewInstance: TObject;
+begin
+  if not Assigned(Instance) then
+  begin
+    Instance := TProdutoSingleton(inherited NewInstance);
+  end;
+
+  Result := Instance;
+end;
+
+procedure TProdutoSingleton.GerarXML(pProdutos: TClientDataSet);
+var
+  XMLDocument: TXMLDocument;
+  NodeArquivo, NodeRegistro: IXMLNode;
+begin
+  XMLDocument := TXMLDocument.Create(nil);
+  try
+    XMLDocument.Active := True;
+    NodeArquivo := XMLDocument.AddChild('XML');
+    pProdutos.First;
+    while not pProdutos.Eof do
+    begin
+      NodeRegistro := NodeArquivo.AddChild('Cliente');
+      NodeRegistro.ChildValues['Id'] := pProdutos.FieldByName('Id').AsString;
+      NodeRegistro.ChildValues['Descricao'] := pProdutos.FieldByName('Descricao').AsString;
+      NodeRegistro.ChildValues['Valor'] := pProdutos.FieldByName('Valor').AsString;
+      NodeRegistro.ChildValues['Quantidade'] := pProdutos.FieldByName('Quantidade').AsString;
+      NodeRegistro.ChildValues['Total'] := pProdutos.FieldByName('Total').AsString;
+      pProdutos.Next;
+    end;
+    XMLDocument.SaveToFile(Path);
+  finally
+    XMLDocument.Free;
+  end;
+end;
+
+function TProdutoSingleton.ProximoID(Id: integer): integer;
+begin
+  Result := Id + 1;
+end;
+
+class function TProdutoSingleton.GetInstance: TProdutoSingleton;
+begin
+  Result := TProdutoSingleton.Create(nil);
+end;
+
+procedure TProdutoSingleton.LerXML(Id: Integer; out pProdutos: TClientDataSet);
+var
+  Doc: IXMLDocument;
+  Node: IXMLNode;
+  I, vId: Integer;
+begin  
+  Doc := LoadXMLDocument(Path);
+  Node := Doc.DocumentElement;
+
+  with Node do
+  begin
+    for I := 0 to ChildNodes.Count - 1 do
+    begin
+      if Id = 0 then
+        vId := ProximoID(Id)
+      else
+        vId := StrToInt(ChildNodes[I].ChildNodes['Id'].Text);
+
+      pProdutos.Open;
+      pProdutos.Append;
+      pProdutos.FieldByName('Id').AsInteger := vId;
+      pProdutos.FieldByName('Descricao').AsString := ChildNodes[I].ChildNodes['Descricao'].Text;
+      pProdutos.FieldByName('Valor').AsFloat := StrToFloat(ChildNodes[I].ChildNodes['Valor'].Text);
+      pProdutos.FieldByName('Quantidade').AsFloat := StrToFloat(ChildNodes[I].ChildNodes['Quantidade'].Text);
+      pProdutos.FieldByName('Total').AsFloat := StrToFloat(ChildNodes[I].ChildNodes['Total'].Text);
+    end;
+  end;
+end;
+
+end.

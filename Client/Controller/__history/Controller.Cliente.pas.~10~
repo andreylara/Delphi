@@ -1,0 +1,37 @@
+unit Controller.Cliente;
+
+interface
+
+uses
+  Model.Cliente, DAO.Cliente;
+
+type
+  TClienteController = class
+    public
+      constructor Create;
+      function Salvar(oCliente: TCliente; var sErro: string): Boolean;
+      function Excluir(iCodigo: Integer; out sErro: String): Boolean;
+  end;
+implementation
+
+{ TClienteController }
+
+constructor TClienteController.Create;
+begin
+  DaoCliente := TDaoCliente.Create(nil);
+end;
+
+function TClienteController.Excluir(iCodigo: Integer;
+  out sErro: String): Boolean;
+begin
+  Result := DaoCliente.Excluir(iCodigo, sErro);
+end;
+
+function TClienteController.Salvar(oCliente: TCliente;
+  var sErro: string): Boolean;
+begin
+  Result := DaoCliente.Salvar(oCliente, sErro);
+end;
+
+end.
+

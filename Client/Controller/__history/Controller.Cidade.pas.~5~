@@ -1,0 +1,31 @@
+unit Controller.Cidade;
+
+interface
+
+uses
+  Model.Cidade, DAO.Cidade;
+
+type
+  TCidadeController = class
+    public
+      function Salvar(oCidade: TCidade; var sErro: string): Boolean;
+      function Excluir(iCodigo: Integer; out sErro: String): Boolean;
+  end;
+implementation
+
+{ TCidadeController }
+
+function TCidadeController.Excluir(iCodigo: Integer;
+  out sErro: String): Boolean;
+begin
+  Result := DaoCidade.Excluir(iCodigo, sErro);
+end;
+
+function TCidadeController.Salvar(oCidade: TCidade;
+  var sErro: string): Boolean;
+begin
+  Result := DaoCidade.Salvar(oCidade, sErro);
+end;
+
+end.
+

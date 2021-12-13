@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{1E1CF34A-D5BA-456B-97B6-CEFBAB7355BE}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="ClientXML.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Test\ClientXMLTests.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ClientXML">
+        <MSBuild Projects="ClientXML.dproj"/>
+    </Target>
+    <Target Name="ClientXML:Clean">
+        <MSBuild Projects="ClientXML.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ClientXML:Make">
+        <MSBuild Projects="ClientXML.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ClientXMLTests">
+        <MSBuild Projects="Test\ClientXMLTests.dproj"/>
+    </Target>
+    <Target Name="ClientXMLTests:Clean">
+        <MSBuild Projects="Test\ClientXMLTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ClientXMLTests:Make">
+        <MSBuild Projects="Test\ClientXMLTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="ClientXML;ClientXMLTests"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="ClientXML:Clean;ClientXMLTests:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="ClientXML:Make;ClientXMLTests:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

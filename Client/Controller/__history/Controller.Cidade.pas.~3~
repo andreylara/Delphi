@@ -1,0 +1,24 @@
+unit Controller.Cidade;
+
+interface
+
+uses
+  Model.Cidade, DAO.Cidade;
+
+type
+  TCidadeController = class
+    public
+      function Salvar(oCidade: TCidade; var sErro: string): Boolean;
+  end;
+implementation
+
+{ TClienteController }
+
+function TClienteController.Salvar(oCliente: TCliente;
+  var sErro: string): Boolean;
+begin
+  Result := DaoCliente.Salvar(oCliente, sErro);
+end;
+
+end.
+

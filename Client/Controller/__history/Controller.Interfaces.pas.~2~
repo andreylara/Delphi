@@ -1,0 +1,25 @@
+unit Controller.Interfaces;
+
+interface
+
+type
+  IControllerCliente = interface;
+  IControllerCidade = interface;
+
+  IControllerCliente = interface
+    ['{AF808D19-C3C5-4E6D-871C-CAD23A735256}']
+    function Selecionar(Id, Cidade: Integer):  IControllerCliente;
+    function Salvar:  IControllerCliente;
+    function Excluir:  IControllerCliente;
+  end;
+
+  IControllerCidade = interface
+    ['{E3C3CF82-D5E8-4875-8948-54C412D2EF96}']
+    function Selecionar(Id: Integer):  IControllerCidade;
+    function Cadastrar:  IControllerCidade;
+    function Excluir:  IControllerCidade;
+  end;
+
+implementation
+
+end.

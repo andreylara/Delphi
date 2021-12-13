@@ -1,0 +1,121 @@
+unit uCliente;
+
+interface
+
+uses
+  System.Classes, DBClient, XMLDoc, XMLIntf;
+
+const
+  Path = 'C:\Visual Software\Teste.xml';
+  
+type
+  TClienteSingleton = class(TComponent)
+  private
+    Nome: String;
+    Email: String;
+    Fone: String;
+
+    constructor Create(AOWner: TComponent); override;
+  public
+    class function GetInstance: TClienteSingleton;
+
+    class function NewInstance: TObject; override;
+
+    function ProximoID(Id: integer): integer;
+    procedure GerarXML(Clientes: TClientDataSet); 
+    procedure LerXML(Id: Integer; out pClientes: TClientDataSet);
+
+    destructor Destroy; override;
+  end;
+
+var
+  Instance: TClienteSingleton;
+
+implementation
+
+uses
+  Forms, SysUtils;
+
+{ TClienteSingleton }
+
+constructor TClienteSingleton.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+end;
+
+destructor TClienteSingleton.Destroy;
+begin
+  FreeAndNil(Instance);
+  inherited;
+end;
+
+class function TClienteSingleton.NewInstance: TObject;
+begin
+  if not Assigned(Instance) then
+  begin
+    Instance := TClienteSingleton(inherited NewInstance);
+  end;
+
+  Result := Instance;
+end;
+
+procedure TClienteSingleton.GerarXML(Clientes: TClientDataSet);
+var
+  XMLDocument: TXMLDocument;
+  NodeArquivo, NodeRegistro: IXMLNode;
+begin
+  XMLDocument := TXMLDocument.Create(nil);
+  try
+    XMLDocument.Active := True;
+    NodeArquivo := XMLDocument.AddChild('XML');
+    Clientes.First;
+    while not Clientes.Eof do
+    begin
+      NodeRegistro := NodeArquivo.AddChild('Cliente');
+      NodeRegistro.ChildValues['Id'] := Clientes.FieldByName('Id').AsString;
+      NodeRegistro.ChildValues['Nome'] := Clientes.FieldByName('Nome').AsString;
+      NodeRegistro.ChildValues['Email'] := Clientes.FieldByName('Email').AsString;
+      NodeRegistro.ChildValues['Fone'] := Clientes.FieldByName('Fone').AsString;
+      Clientes.Next;
+    end;
+    XMLDocument.SaveToFile(Path);
+  finally
+    XMLDocument.Free;
+  end;
+end;
+
+function TClienteSingleton.ProximoID(Id: integer): integer;
+begin
+  Result := Id + 1;
+end;
+
+class function TClienteSingleton.GetInstance: TClienteSingleton;
+begin
+  Result := TClienteSingleton.Create(nil);
+end;
+
+procedure TClienteSingleton.LerXML(Id: Integer; out pClientes: TClientDataSet);
+var
+  Doc: IXMLDocument;
+  Node: IXMLNode;
+  I, teste: Integer;
+begin  
+  Doc := LoadXMLDocument(Path);
+  Node := Doc.DocumentElement;
+
+  with Node do
+  begin
+    for I := 0 to ChildNodes.Count - 1 do
+    begin
+      Id := ProximoID(Id);
+      pClientes.Open;
+      pClientes.Append;
+      pClientes.FieldByName('Id').AsString := ChildNodes[I].ChildNodes['Id'].Text;
+      pClientes.FieldByName('Nome').AsString := ChildNodes[I].ChildNodes['Nome'].Text;
+      pClientes.FieldByName('Email').AsString := ChildNodes[I].ChildNodes['Email'].Text;
+      pClientes.FieldByName('Fone').AsString := ChildNodes[I].ChildNodes['Fone'].Text;
+    end;
+  end;
+end;
+
+end.

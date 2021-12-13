@@ -1,0 +1,89 @@
+unit uLogin;
+
+interface
+
+type
+  TLogin = class
+  private
+    Usuario: String;
+    Senha: String;
+    constructor Create;
+  public
+    class function GetInstance: TLogin;
+
+    class function NewInstance: TObject; override;
+
+    procedure Authentication(out erro: string);
+
+    destructor Destroy; override;
+  end;
+
+var
+  Instance: TLogin;
+
+implementation
+
+uses
+  Forms, SysUtils, System.JSON, UnitDM, REST.Types;
+
+
+{ TLogin }
+
+procedure TLogin.Authentication(out erro: string);
+var
+  jsonBody: TJSONObject;
+begin
+  try
+    try
+      erro := '';
+
+      jsonBody := TJSONObject.Create;
+      jsonBody.AddPair('usuario', usuario);
+      jsonBody.AddPair('senha', senha);
+
+      dm.ReqAuthentication.Params.Clear;
+      dm.ReqAuthentication.Body.ClearBody;
+      dm.ReqAuthentication.Method := rmPost;
+      dm.ReqAuthentication.Body.Add(jsonBody.ToString,
+        ContentTypeFromString('application/json'));
+      dm.ReqAuthentication.Execute;
+
+      if (dm.ReqAuthentication.Response.StatusCode <> 200) then
+      begin
+        erro := 'Erro na autenticação: ';
+        Exit;
+      end;
+    except
+      on ex: exception do
+        erro := 'Erro inesperado: ' + ex.Message;
+    end;
+  finally
+    jsonBody.Free;
+  end;
+end;
+
+constructor TLogin.Create;
+begin
+  inherited Create();
+end;
+
+destructor TLogin.Destroy;
+begin
+  inherited Destroy;
+end;
+
+class function TLogin.GetInstance: TLogin;
+begin
+  result := TLogin.Create;
+end;
+
+class function TLogin.NewInstance: TObject;
+begin
+  if not Assigned(Instance) then
+  begin
+    Instance := TLogin(inherited NewInstance);
+  end;
+  result := Instance;
+end;
+
+end.

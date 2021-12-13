@@ -1,0 +1,26 @@
+unit uLogin;
+
+interface
+
+type
+  TLogin = class
+  private
+    Usuario: String;
+    Senha: String;
+    constructor Create;
+  public
+    class function GetInstance: TLogin;
+
+    class function NewInstance: TObject; override;
+
+    procedure Authentication(out erro: string);
+
+    destructor Destroy; override;
+  end;
+
+var
+  Instance: TLogin;
+
+implementation
+
+end.

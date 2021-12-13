@@ -1,0 +1,12 @@
+boss init --q
+boss i horse
+boss i jhonson
+boss i handle-exception
+boss i github.com/viniciussanchez/dataset-serialize
+//Gerar token JWT
+boss i github.com/paolo-rossi/delphi-jose-jwt
+//Validar token JWT
+boss i horse-jwt
+
+
+

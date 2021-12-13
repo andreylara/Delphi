@@ -1,0 +1,23 @@
+program Client;
+
+uses
+  Vcl.Forms,
+  View.Principal in 'View\View.Principal.pas' {FrmPrincipal},
+  Model.Dados in 'Model\Model.Dados.pas' {dm: TDataModule},
+  UnitLogin in 'UnitLogin.pas' {FrmLogin},
+  uLogin in 'uLogin.pas',
+  Controller.Interfaces in 'Controller\Controller.Interfaces.pas',
+  Controller.Clientes in 'Controller\Controller.Clientes.pas',
+  Controller.Cidades in 'Controller\Controller.Cidades.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TFrmLogin, FrmLogin);
+  Application.CreateForm(TFrmPrincipal, FrmPrincipal);
+  Application.CreateForm(Tdm, dm);
+  Application.Run;
+
+end.

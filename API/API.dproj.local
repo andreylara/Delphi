@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2021/11/11 19:46:45.000.533,C:\Users\Visual Software\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\Users\Visual Software\Desktop\PDI\API.dproj</Transaction>
+    <Transaction>2021/11/11 20:01:42.000.969,=C:\Users\Visual Software\Desktop\PDI\Unit1.pas</Transaction>
+    <Transaction>2021/11/11 20:01:58.000.696,C:\Users\Visual Software\Desktop\PDI\Unit1.pas=C:\Users\Visual Software\Desktop\PDI\Controller\Controller.Cliente.pas</Transaction>
+    <Transaction>2021/11/11 20:09:51.000.269,=C:\Users\Visual Software\Desktop\PDI\Unit1.pas</Transaction>
+    <Transaction>2021/11/11 20:12:45.000.231,=C:\Users\Visual Software\Desktop\PDI\Model\Model.Connection.pas</Transaction>
+    <Transaction>2021/11/11 20:28:22.000.774,=C:\Users\Visual Software\Desktop\PDI\Unit1.pas</Transaction>
+    <Transaction>2021/11/11 20:28:38.000.882,C:\Users\Visual Software\Desktop\PDI\Unit1.pas=C:\Users\Visual Software\Desktop\PDI\Model\Model.Cliente.pas</Transaction>
+    <Transaction>2021/11/18 21:37:40.000.994,=C:\Users\Visual Software\Desktop\PDI\API\Unit1.pas</Transaction>
+    <Transaction>2021/11/18 21:38:02.000.661,C:\Users\Visual Software\Desktop\PDI\API\Controller\Controller.Authentication.pas=C:\Users\Visual Software\Desktop\PDI\API\Unit1.pas</Transaction>
+    <Transaction>2021/11/18 21:42:58.000.337,=C:\Users\Visual Software\Desktop\PDI\API\Unit1.pas</Transaction>
+    <Transaction>2021/11/18 21:43:29.000.208,C:\Users\Visual Software\Desktop\PDI\API\Controller\Test.Authentication.dfm=C:\Users\Visual Software\Desktop\PDI\API\Unit1.dfm</Transaction>
+    <Transaction>2021/11/18 21:43:29.000.208,C:\Users\Visual Software\Desktop\PDI\API\Controller\Test.Authentication.pas=C:\Users\Visual Software\Desktop\PDI\API\Unit1.pas</Transaction>
+    <Transaction>2021/11/18 21:52:23.000.541,C:\Users\Visual Software\Desktop\PDI\API\Controller\Test.Authentication.pas=</Transaction>
+    <Transaction>2021/11/19 21:58:17.000.773,=C:\Users\Visual Software\Desktop\PDI\API\Unit1.pas</Transaction>
+    <Transaction>2021/11/19 21:59:03.000.288,C:\Users\Visual Software\Desktop\PDI\API\Unit1.pas=C:\Users\Visual Software\Desktop\PDI\API\Model\Model.Usuario.pas</Transaction>
+    <Transaction>2021/11/19 23:05:03.000.610,C:\Users\Visual Software\Desktop\PDI\API\Model\Model.Usuario.pas=</Transaction>
+    <Transaction>2021/11/19 23:06:15.000.166,=C:\Users\Visual Software\Desktop\PDI\API\Unit1.pas</Transaction>
+    <Transaction>2021/11/22 18:33:48.000.286,=C:\Users\Visual Software\Desktop\PDI\API\Unit1.pas</Transaction>
+    <Transaction>2021/11/22 18:34:11.000.930,C:\Users\Visual Software\Desktop\PDI\API\Controller\Controller.Cidade.pas=C:\Users\Visual Software\Desktop\PDI\API\Unit1.pas</Transaction>
+    <Transaction>2021/11/22 18:34:52.000.258,=C:\Users\Visual Software\Desktop\PDI\API\Unit1.pas</Transaction>
+    <Transaction>2021/11/22 18:35:05.000.042,C:\Users\Visual Software\Desktop\PDI\API\Model\Model.Cidade.pas=C:\Users\Visual Software\Desktop\PDI\API\Unit1.pas</Transaction>
+  </Transactions>
+</BorlandProject>

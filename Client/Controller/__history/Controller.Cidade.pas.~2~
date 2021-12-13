@@ -1,0 +1,35 @@
+unit Controller.Cidade;
+
+interface
+
+uses
+  Controller.Interfaces;
+
+Type
+  TControllerCidade = class(TInterfacedObject, iControllerCidade)
+    private
+    public
+      constructor Create;
+      destructor Destroy; override;
+      class function New: iControllerCidade;
+  end;
+
+implementation
+
+{ TControllerCliente }
+
+constructor TControllerCidade.Create;
+begin
+                                                                a
+end;
+
+destructor TControllerCidade.Destroy;
+begin
+
+  inherited;
+end;
+
+class function TControllerCidade.New: IControllerCliente;
+begin
+  Result := Self.Create;
+end;

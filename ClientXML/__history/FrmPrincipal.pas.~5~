@@ -1,0 +1,54 @@
+unit FrmPrincipal;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.Grids, Vcl.DBGrids,
+  dxGDIPlusClasses, Vcl.ExtCtrls, Vcl.StdCtrls, Datasnap.DBClient;
+
+type
+  TForm1 = class(TForm)
+    lbNome: TLabel;
+    edtFone: TEdit;
+    edtNome: TEdit;
+    lbFone: TLabel;
+    edtEmail: TEdit;
+    lbEmail: TLabel;
+    imgExcluir: TImage;
+    imgSalvar: TImage;
+    DBGrid1: TDBGrid;
+    Button1: TButton;
+    Button2: TButton;
+    cdsCliente: TClientDataSet;
+    cdsClienteId: TIntegerField;
+    cdsClienteNome: TStringField;
+    cdsClienteEmail: TStringField;
+    cdsClienteFone: TStringField;
+    dsCliente: TDataSource;
+    procedure Image2Click(Sender: TObject);
+    procedure imgSalvarClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.dfm}
+
+uses
+  uCliente;
+
+procedure TForm1.imgSalvarClick(Sender: TObject);
+var
+  Cliente: TCliente;
+begin
+
+end;
+
+end.

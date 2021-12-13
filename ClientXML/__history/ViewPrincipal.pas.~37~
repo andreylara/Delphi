@@ -1,0 +1,99 @@
+unit ViewPrincipal;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.Grids, Vcl.DBGrids,
+  dxGDIPlusClasses, Vcl.ExtCtrls, Vcl.StdCtrls, Datasnap.DBClient, cxGraphics,
+  cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer, cxEdit,
+  dxSkinsCore, cxTextEdit, cxCurrencyEdit;
+
+type
+  TFrmPrincipal = class(TForm)
+    lbDescricao: TLabel;
+    edtDescricao: TEdit;
+    lbValor: TLabel;
+    imgExcluir: TImage;
+    imgSalvar: TImage;
+    DBGrid1: TDBGrid;
+    Button1: TButton;
+    Button2: TButton;
+    cdsProduto: TClientDataSet;
+    cdsProdutoId: TIntegerField;
+    dsProduto: TDataSource;
+    Label1: TLabel;
+    cdsProdutoTotal: TFloatField;
+    cdsProdutoValor: TFloatField;
+    cdsProdutoQuantidade: TFloatField;
+    cdsProdutoDescricao: TStringField;
+    edtValor: TcxCurrencyEdit;
+    edtQuantidade: TcxCurrencyEdit;
+    procedure imgSalvarClick(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure imgExcluirClick(Sender: TObject);
+  private
+    procedure LimpaCampos;
+  public
+    { Public declarations }
+  end;
+
+var
+  FrmPrincipal: TFrmPrincipal;
+
+implementation
+
+{$R *.dfm}
+
+uses
+  uProduto;
+
+procedure TFrmPrincipal.Button1Click(Sender: TObject);
+var
+  Produto: TProdutoSingleton;
+begin
+  Produto := TProdutoSingleton.GetInstance;
+  Produto.LerXML(cdsProduto.RecordCount, cdsProduto);
+end;
+
+procedure TFrmPrincipal.Button2Click(Sender: TObject);
+var
+  Produto: TProdutoSingleton;
+begin
+  Produto := TProdutoSingleton.GetInstance;
+  Produto.GerarXML(cdsProduto);
+end;
+
+procedure TFrmPrincipal.imgExcluirClick(Sender: TObject);
+begin
+  cdsProduto.Open;
+  cdsProduto.Delete;
+  LimpaCampos;
+end;
+
+procedure TFrmPrincipal.imgSalvarClick(Sender: TObject);
+var
+  Produto: TProdutoSingleton;
+begin
+  Produto := TProdutoSingleton.GetInstance;
+
+  cdsProduto.Open;
+  cdsProduto.Append;
+  cdsProdutoId.Value := Produto.ProximoID(cdsProduto.RecordCount);
+  cdsProdutoDescricao.Value := edtDescricao.Text;
+  cdsProdutoValor.Value := edtValor.Value;
+  cdsProdutoQuantidade.Value := edtQuantidade.Value;
+  cdsProdutoTotal.Value := Produto.CalculaTotal(edtValor.Value, edtQuantidade.Value);
+  LimpaCampos;
+end;
+
+procedure TFrmPrincipal.LimpaCampos;
+begin
+  edtDescricao.Text := '';
+  edtValor.Text := '0';
+  edtQuantidade.Text := '0';
+  edtDescricao.SetFocus;
+end;
+
+end.

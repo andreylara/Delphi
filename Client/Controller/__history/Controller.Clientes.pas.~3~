@@ -1,0 +1,35 @@
+unit Controller.Clientes;
+
+interface
+
+uses
+  Controller.Interfaces;
+
+Type
+  TControllerCliente = class(TInterfacedObject, iControllerCliente)
+    private
+    public
+      constructor Create;
+      destructor Destroy; override;
+      class function New: iControllerCliente;
+  end;
+
+implementation
+
+{ TControllerCliente }
+
+constructor TControllerCliente.Create;
+begin
+                                                                a
+end;
+
+destructor TControllerCliente.Destroy;
+begin
+
+  inherited;
+end;
+
+class function TControllerCliente.New: IControllerCliente;
+begin
+
+end;

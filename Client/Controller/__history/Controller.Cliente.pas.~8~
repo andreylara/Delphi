@@ -1,0 +1,24 @@
+unit Controller.Cliente;
+
+interface
+
+uses
+  Model.Cliente, DAO.Cliente;
+
+type
+  TClienteController = class
+    public
+      function Salvar(oCliente: TCliente; var sErro: string): Boolean;
+  end;
+implementation
+
+{ TClienteController }
+
+function TClienteController.Salvar(oCliente: TCliente;
+  var sErro: string): Boolean;
+begin
+  Result := DaoCliente.Salvar(oCliente, sErro);
+end;
+
+end.
+

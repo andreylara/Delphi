@@ -1,0 +1,89 @@
+unit UnitLogin;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, cxGraphics, cxControls, cxLookAndFeels,
+  cxLookAndFeelPainters, cxContainer, cxEdit, dxSkinsCore, dxGDIPlusClasses,
+  Vcl.ExtCtrls, Vcl.StdCtrls, cxGroupBox, System.JSON, REST.Types;
+
+type
+  TFrmLogin = class(TForm)
+    gbLogin: TcxGroupBox;
+    edtUsuario: TEdit;
+    lbSenha: TLabel;
+    edtSenha: TEdit;
+    lbUsuario: TLabel;
+    imgLogin: TImage;
+    procedure imgLoginClick(Sender: TObject);
+    function Authentication(usuario, senha: string; out erro: string): Boolean;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FrmLogin: TFrmLogin;
+
+implementation
+
+uses
+  UnitDM, UnitPrincipal;
+
+{$R *.dfm}
+
+function TFrmLogin.Authentication(usuario, senha: string;
+  out erro: string): Boolean;
+var
+  jsonBody: TJSONObject;
+begin
+  try
+    try
+      Result := false;
+      erro := '';
+
+      jsonBody := TJSONObject.Create;
+      jsonBody.AddPair('usuario', usuario);
+      jsonBody.AddPair('senha', senha);
+
+      dm.ReqAuthentication.Params.Clear;
+      dm.ReqAuthentication.Body.ClearBody;
+      dm.ReqAuthentication.Method := rmPost;
+      dm.ReqAuthentication.Body.Add(jsonBody.ToString,
+        ContentTypeFromString('application/json'));
+      dm.ReqAuthentication.Execute;
+
+      if (dm.ReqAuthentication.Response.StatusCode <> 200) then
+      begin
+        erro := 'Erro na autenticação: ';
+        Exit;
+      end;
+
+      Result := True;
+    except
+      on ex: exception do
+        erro := 'Erro inesperado: ' + ex.Message;
+    end;
+  finally
+    jsonBody.Free;
+  end;
+end;
+
+procedure TFrmLogin.imgLoginClick(Sender: TObject);
+var
+  erro: string;
+  AFrm: TFrmPrincipal;
+begin
+  if not Authentication(edtUsuario.Text, edtSenha.Text, erro) then
+    ShowMessage(erro)
+  else
+  begin
+    AFrm := TFrmPrincipal.Create(Application);
+    AFrm.ShowModal;
+    AFrm.Destroy;
+  end;
+end;
+
+end.
